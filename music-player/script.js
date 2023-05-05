@@ -2,6 +2,10 @@ const image = document.querySelector('img');
 const title = document.getElementById('title');
 const artist = document.getElementById('artist');
 const music = document.querySelector("audio");
+const progressContainer = document.getElementById('progress-container');
+const progress = document.getElementById('progress');
+const currentTImeEl = document.getElementById('current-time');
+const durationEl = document.getElementById('duration');
 const prevBtn = document.getElementById("prev");
 const playBtn = document.getElementById("play");
 const nextBtn = document.getElementById("next");
@@ -86,6 +90,55 @@ function nextSong(){
 //On Load - Select First Song
 loadSong(songs[songIndex]);
 
+// Update Progress Bar & Time
+function updateProgressBar(e){
+    if (isPlaying){
+        // this is using destructuring
+        const { duration, currentTime } = e.srcElement;
+
+        //update progress bar width
+        const progressPercent = (currentTime / duration) * 100;
+        progress.style.width = `${progressPercent}%`;
+
+        //calculate display for duration
+        const durationMinutes = Math.floor(duration / 60);
+        let durationSeconds = Math.floor(duration % 60);
+        if(durationSeconds < 10){
+            durationSeconds = `0${durationSeconds}`;
+        }
+        
+        //Delay switching duration Element to avoid NaN (it will change style after durationSeconds true)
+        if(durationSeconds){
+            durationEl.textContent = `${durationMinutes}:${durationSeconds}`;
+
+        }
+
+        //calculate display for current
+        const currentMinutes = Math.floor(currentTime / 60);
+        let currentSeconds = Math.floor(currentTime % 60);
+        if(currentSeconds < 10){
+            currentSeconds = `0${currentSeconds}`;
+        }
+
+        currentTImeEl.textContent = `${currentMinutes}:${currentSeconds}`;
+    }
+}
+
+//set progress bar when click progress bar
+function setProgressBar(e){
+    const width = this.clientWidth;//this is same with e.srcElement.clientWidth
+    const clickX = e.offsetX;
+
+    //this is access from duration music with destructuring
+    const {duration} = music;
+
+    //this is for set current time
+    music.currentTime = (clickX / width) * duration;
+}
+
 //Event Listeners 
 prevBtn.addEventListener('click', prevSong);
 nextBtn.addEventListener('click', nextSong);
+music.addEventListener('ended', nextSong);//this when end song will auto play next song
+music.addEventListener('timeupdate', updateProgressBar);
+progressContainer.addEventListener('click', setProgressBar);
