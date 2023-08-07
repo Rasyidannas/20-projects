@@ -7,6 +7,10 @@ const countdownElTitle = document.getElementById("countdown-title");
 const countdownBtn = document.getElementById("countdown-button");
 const timeElements = document.querySelectorAll("span");
 
+const completeEl = document.getElementById("complete");
+const completeElInfo = document.getElementById("complete-info");
+const conpleteBtn = document.getElementById("complete-button");
+
 let countdownTitle = "";
 let countdownDate = "";
 let countdownValue = Date;
@@ -35,17 +39,25 @@ function updateDOM() {
 
     console.log(days, hours, minutes, seconds);
 
-    //populate Countdown
-    countdownElTitle.textContent = `${countdownTitle}`;
-    timeElements[0].textContent = `${days}`;
-    timeElements[1].textContent = `${hours}`;
-    timeElements[2].textContent = `${minutes}`;
-    timeElements[3].textContent = `${seconds}`;
-
     //Hide Input
     inputContainer.hidden = true;
-    //Show Countdown
-    countdownEl.hidden = false;
+
+    //if countdown has ended, show complete
+    if(distance < 0) {
+      countdownEl.hidden = true
+      clearInterval(countdownActive);
+      completeElInfo.textContent = `${countdownTitle} finish on ${countdownDate}`;
+      completeEl.hidden = false
+    }else{
+      //else, show the countdown in progress
+      countdownElTitle.textContent = `${countdownTitle}`;
+      timeElements[0].textContent = `${days}`;
+      timeElements[1].textContent = `${hours}`;
+      timeElements[2].textContent = `${minutes}`;
+      timeElements[3].textContent = `${seconds}`;
+      completeEl.hidden = true;
+      countdownEl.hidden = false
+    }
   }, second);
 }
 
@@ -70,6 +82,7 @@ function updateCountDown(e) {
 function reset() {
   //Hide countdowns, show input
   countdownEl.hidden = true;
+  completeEl.hidden = true;
   inputContainer.hidden = false;
   //stop the countdown
   clearInterval(countdownActive);
@@ -81,3 +94,4 @@ function reset() {
 //Event Listener for form
 countdownFowm.addEventListener("submit", updateCountDown);
 countdownBtn.addEventListener("click", reset);
+conpleteBtn.addEventListener("click", reset)
